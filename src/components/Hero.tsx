@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Smartphone, Users } from 'lucide-react';
 
-export const Hero = () => {
+interface HeroProps {
+  onDemoClick: () => void;
+}
+
+export const Hero = ({ onDemoClick }: HeroProps) => {
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto text-center">
@@ -29,6 +33,7 @@ export const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
               size="lg" 
+              onClick={onDemoClick}
               className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-4 text-lg"
             >
               <MessageCircle className="w-5 h-5 mr-2" />
@@ -38,6 +43,7 @@ export const Hero = () => {
             <Button 
               variant="outline" 
               size="lg" 
+              onClick={onDemoClick}
               className="border-orange-300 text-orange-700 hover:bg-orange-50 px-8 py-4 text-lg"
             >
               Watch Demo

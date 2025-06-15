@@ -1,10 +1,13 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MessageCircle, Menu } from 'lucide-react';
 
-export const Header = () => {
+interface HeaderProps {
+  onDemoClick: () => void;
+}
+
+export const Header = ({ onDemoClick }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleNavClick = (href: string) => {
@@ -45,7 +48,10 @@ export const Header = () => {
                 {item.label}
               </button>
             ))}
-            <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+            <Button 
+              onClick={onDemoClick}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white"
+            >
               <MessageCircle className="w-4 h-4 mr-2" />
               Start Learning
             </Button>
@@ -69,7 +75,10 @@ export const Header = () => {
                   </button>
                 ))}
                 <Button 
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    onDemoClick();
+                  }}
                   className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white w-full mt-4"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
