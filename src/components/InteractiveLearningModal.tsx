@@ -140,20 +140,3 @@ export const InteractiveLearningModal = ({ isOpen, onClose }: InteractiveLearnin
     </Dialog>
   );
 };
-</tml-write>
-
-<lov-write file_path="src/hooks/useInteractiveLearning.tsx">
-import { useState } from 'react';
-
-export const useInteractiveLearning = () => {
-  const [isLearningOpen, setIsLearningOpen] = useState(false);
-
-  const openLearning = () => setIsLearningOpen(true);
-  const closeLearning = () => setIsLearningOpen(false);
-
-  return {
-    isLearningOpen,
-    openLearning,
-    closeLearning
-  };
-};
