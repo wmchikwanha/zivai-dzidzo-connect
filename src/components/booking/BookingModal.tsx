@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Service {
   id: string;
@@ -26,12 +27,13 @@ interface BookingModalProps {
 
 export const BookingModal = ({ isOpen, onClose, service }: BookingModalProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     preferredDate: '',
     preferredTime: '',
     message: '',
-    contactEmail: ''
+    contactEmail: user?.email || ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,8 +41,6 @@ export const BookingModal = ({ isOpen, onClose, service }: BookingModalProps) =>
     setIsLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         toast({
           title: "Authentication required",
@@ -50,9 +50,37 @@ export const BookingModal = ({ isOpen, onClose, service }: BookingModalProps) =>
         return;
       }
 
-      // For now, we'll just show a success message since we don't have the bookings table yet
-      // In a real implementation, you would save the booking to the database
-      
+      // Get the mentor's user_id for this service
+      const { data: serviceData, error: serviceError } = await supabase
+        .from('services')
+        .select('mentors(user_id)')
+        .eq('id', service.id)
+        .single();
+
+      if (serviceError) throw serviceError;
+
+      const mentorUserId = serviceData?.mentors?.user_id;
+      if (!mentorUserId) {
+        throw new Error('Could not find mentor for this service');
+      }
+
+      // Create the booking
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          service_id: service.id,
+          mentee_user_id: user.id,
+          mentor_user_id: mentorUserId,
+          scheduled_date: formData.preferredDate,
+          scheduled_time: formData.preferredTime,
+          contact_email: formData.contactEmail,
+          message: formData.message,
+          total_price: service.price,
+          status: 'pending'
+        });
+
+      if (bookingError) throw bookingError;
+
       toast({
         title: "Booking request submitted!",
         description: `Your request for "${service.title}" has been sent to ${service.mentorName}. They will contact you soon to confirm the session.`
@@ -63,14 +91,14 @@ export const BookingModal = ({ isOpen, onClose, service }: BookingModalProps) =>
         preferredDate: '',
         preferredTime: '',
         message: '',
-        contactEmail: ''
+        contactEmail: user?.email || ''
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting booking:', error);
       toast({
         title: "Error",
-        description: "Failed to submit booking request. Please try again.",
+        description: error.message || "Failed to submit booking request. Please try again.",
         variant: "destructive"
       });
     } finally {
