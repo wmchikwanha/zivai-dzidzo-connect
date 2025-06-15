@@ -1,9 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MessageCircle, Menu } from 'lucide-react';
 
 export const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleNavClick = (href: string) => {
+    setIsOpen(false);
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const navItems = [
+    { href: '#features', label: 'Features' },
+    { href: '#languages', label: 'Languages' },
+    { href: '#pricing', label: 'Pricing' },
+  ];
+
   return (
     <header className="bg-white/90 backdrop-blur-sm border-b border-orange-200 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
@@ -19,18 +36,48 @@ export const Header = () => {
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#features" className="text-gray-700 hover:text-orange-600 transition-colors">Features</a>
-            <a href="#languages" className="text-gray-700 hover:text-orange-600 transition-colors">Languages</a>
-            <a href="#pricing" className="text-gray-700 hover:text-orange-600 transition-colors">Pricing</a>
+            {navItems.map((item) => (
+              <button
+                key={item.href}
+                onClick={() => handleNavClick(item.href)}
+                className="text-gray-700 hover:text-orange-600 transition-colors"
+              >
+                {item.label}
+              </button>
+            ))}
             <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
               <MessageCircle className="w-4 h-4 mr-2" />
               Start Learning
             </Button>
           </nav>
           
-          <Button variant="ghost" className="md:hidden">
-            <Menu className="w-6 h-6" />
-          </Button>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" className="md:hidden">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-80">
+              <div className="flex flex-col space-y-6 mt-8">
+                {navItems.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={() => handleNavClick(item.href)}
+                    className="text-left text-lg text-gray-700 hover:text-orange-600 transition-colors py-2"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <Button 
+                  onClick={() => setIsOpen(false)}
+                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white w-full mt-4"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Start Learning
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
