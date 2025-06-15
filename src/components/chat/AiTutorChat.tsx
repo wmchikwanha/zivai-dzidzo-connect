@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +24,15 @@ export const AiTutorChat = ({ selectedLanguage, isOpen, onToggle }: AiTutorChatP
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   const getWelcomeMessage = () => {
     switch (selectedLanguage) {
@@ -191,12 +198,6 @@ export const AiTutorChat = ({ selectedLanguage, isOpen, onToggle }: AiTutorChatP
     }
   }, [selectedLanguage]);
 
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
-
   const getCategoryIcon = (category?: string) => {
     switch (category) {
       case 'business-basics': return <BookOpen className="w-4 h-4" />;
@@ -243,7 +244,7 @@ export const AiTutorChat = ({ selectedLanguage, isOpen, onToggle }: AiTutorChatP
       </CardHeader>
 
       <CardContent className="flex-1 p-0 flex flex-col">
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+        <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -301,6 +302,7 @@ export const AiTutorChat = ({ selectedLanguage, isOpen, onToggle }: AiTutorChatP
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
