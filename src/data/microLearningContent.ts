@@ -32,7 +32,7 @@ export interface LearningCategory {
   estimatedTime: string;
 }
 
-export const learningCategories: Record<string, LearningCategory> = {
+export const learningCategories: Record<string, Record<string, LearningCategory>> = {
   english: {
     'business-basics': {
       id: 'business-basics',
