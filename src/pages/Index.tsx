@@ -11,22 +11,22 @@ import { Languages } from '@/components/Languages';
 import { Pricing } from '@/components/Pricing';
 import { Testimonials } from '@/components/Testimonials';
 import { Footer } from '@/components/Footer';
-import { DemoModal } from '@/components/DemoModal';
-import { useDemo } from '@/hooks/useDemo';
+import { InteractiveLearningModal } from '@/components/InteractiveLearningModal';
+import { useInteractiveLearning } from '@/hooks/useInteractiveLearning';
 
 const Index = () => {
-  const { isDemoOpen, openDemo, closeDemo } = useDemo();
+  const { isLearningOpen, openLearning, closeLearning } = useInteractiveLearning();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
-      <Header onDemoClick={openDemo} />
-      <Hero onDemoClick={openDemo} />
+      <Header onLearningClick={openLearning} />
+      <Hero onLearningClick={openLearning} />
       <Features />
       <Languages />
-      <Pricing onDemoClick={openDemo} />
+      <Pricing onLearningClick={openLearning} />
       <Testimonials />
-      <Footer onDemoClick={openDemo} />
-      <DemoModal isOpen={isDemoOpen} onClose={closeDemo} />
+      <Footer onLearningClick={openLearning} />
+      <InteractiveLearningModal isOpen={isLearningOpen} onClose={closeLearning} />
     </div>
   );
 };

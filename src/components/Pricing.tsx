@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Check, MessageCircle } from 'lucide-react';
 
 interface PricingProps {
-  onDemoClick: () => void;
+  onLearningClick: () => void;
 }
 
-export const Pricing = ({ onDemoClick }: PricingProps) => {
+export const Pricing = ({ onLearningClick }: PricingProps) => {
   const plans = [
     {
       name: "Free Tier",
@@ -106,7 +106,7 @@ export const Pricing = ({ onDemoClick }: PricingProps) => {
                 </ul>
                 
                 <Button 
-                  onClick={onDemoClick}
+                  onClick={onLearningClick}
                   className={`w-full ${plan.popular 
                     ? 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white' 
                     : 'bg-white border border-orange-300 text-orange-700 hover:bg-orange-50'

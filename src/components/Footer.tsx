@@ -1,12 +1,13 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
 
 interface FooterProps {
-  onDemoClick: () => void;
+  onLearningClick: () => void;
 }
 
-export const Footer = ({ onDemoClick }: FooterProps) => {
+export const Footer = ({ onLearningClick }: FooterProps) => {
   return (
     <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16">
       <div className="container mx-auto px-4">
@@ -28,11 +29,11 @@ export const Footer = ({ onDemoClick }: FooterProps) => {
             </p>
             
             <Button 
-              onClick={onDemoClick}
+              onClick={onLearningClick}
               className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
-              Text "DZIDZO" to Start
+              Start Learning Now
             </Button>
           </div>
           
