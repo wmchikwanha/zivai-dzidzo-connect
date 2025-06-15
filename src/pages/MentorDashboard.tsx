@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,12 +7,7 @@ import { User, Settings, DollarSign, Calendar, Star, TrendingUp } from 'lucide-r
 import { MentorRegistrationForm } from '@/components/mentors/MentorRegistrationForm';
 import { SubscriptionPlans } from '@/components/mentors/SubscriptionPlans';
 import { ServiceManagement } from '@/components/mentors/ServiceManagement';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { supabase } from '@/lib/supabase';
 
 interface MentorProfile {
   id: string;
