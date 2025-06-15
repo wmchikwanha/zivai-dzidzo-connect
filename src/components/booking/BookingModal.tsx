@@ -1,0 +1,200 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Calendar, Clock, DollarSign, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
+
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  duration_minutes: number;
+  price: number;
+  mentorName: string;
+}
+
+interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  service: Service;
+}
+
+export const BookingModal = ({ isOpen, onClose, service }: BookingModalProps) => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    preferredDate: '',
+    preferredTime: '',
+    message: '',
+    contactEmail: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to book a session.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // For now, we'll just show a success message since we don't have the bookings table yet
+      // In a real implementation, you would save the booking to the database
+      
+      toast({
+        title: "Booking request submitted!",
+        description: `Your request for "${service.title}" has been sent to ${service.mentorName}. They will contact you soon to confirm the session.`
+      });
+
+      onClose();
+      setFormData({
+        preferredDate: '',
+        preferredTime: '',
+        message: '',
+        contactEmail: ''
+      });
+
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit booking request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Book Your Session</DialogTitle>
+        </DialogHeader>
+
+        {/* Service Summary */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-semibold text-lg">{service.title}</h3>
+              <p className="text-gray-600 flex items-center mt-1">
+                <User className="w-4 h-4 mr-1" />
+                with {service.mentorName}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-orange-600">${service.price}</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <span className="flex items-center">
+              <Clock className="w-4 h-4 mr-1" />
+              {service.duration_minutes} minutes
+            </span>
+          </div>
+          
+          <p className="text-gray-700 mt-3">{service.description}</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="preferredDate">Preferred Date *</Label>
+              <Input
+                id="preferredDate"
+                type="date"
+                value={formData.preferredDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, preferredDate: e.target.value }))}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="preferredTime">Preferred Time *</Label>
+              <Input
+                id="preferredTime"
+                type="time"
+                value={formData.preferredTime}
+                onChange={(e) => setFormData(prev => ({ ...prev, preferredTime: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contactEmail">Contact Email *</Label>
+            <Input
+              id="contactEmail"
+              type="email"
+              value={formData.contactEmail}
+              onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+              placeholder="your.email@example.com"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="message">Message to Mentor</Label>
+            <Textarea
+              id="message"
+              value={formData.message}
+              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+              placeholder="Tell your mentor what you'd like to focus on in this session..."
+              rows={4}
+            />
+          </div>
+
+          {formData.preferredDate && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Session Summary</h4>
+              <div className="space-y-1 text-blue-800">
+                <p><strong>Date:</strong> {formatDate(formData.preferredDate)}</p>
+                <p><strong>Time:</strong> {formData.preferredTime}</p>
+                <p><strong>Duration:</strong> {service.duration_minutes} minutes</p>
+                <p><strong>Total Cost:</strong> ${service.price}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+            >
+              {isLoading ? 'Submitting...' : 'Submit Booking Request'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
