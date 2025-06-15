@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User, Mail, Phone, Globe, Linkedin, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MentorFormData {
   firstName: string;
@@ -60,6 +61,8 @@ export const MentorRegistrationForm = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user);
+      
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -69,7 +72,9 @@ export const MentorRegistrationForm = () => {
         return;
       }
 
-      const { error } = await supabase
+      console.log('Attempting to insert mentor data for user:', user.id);
+
+      const { data, error } = await supabase
         .from('mentors')
         .insert({
           user_id: user.id,
@@ -85,7 +90,12 @@ export const MentorRegistrationForm = () => {
           website_url: formData.websiteUrl
         });
 
-      if (error) throw error;
+      console.log('Insert result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       toast({
         title: "Registration Successful!",
@@ -99,11 +109,14 @@ export const MentorRegistrationForm = () => {
         linkedinUrl: '', websiteUrl: ''
       });
 
-    } catch (error) {
+      // Reload the page to refresh the mentor dashboard
+      window.location.reload();
+
+    } catch (error: any) {
       console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
-        description: "Please try again or contact support.",
+        description: error.message || "Please try again or contact support.",
         variant: "destructive"
       });
     } finally {

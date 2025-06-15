@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { User, Settings, DollarSign, Calendar, Star, TrendingUp } from 'lucide-r
 import { MentorRegistrationForm } from '@/components/mentors/MentorRegistrationForm';
 import { SubscriptionPlans } from '@/components/mentors/SubscriptionPlans';
 import { ServiceManagement } from '@/components/mentors/ServiceManagement';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MentorProfile {
   id: string;
@@ -29,7 +30,12 @@ const MentorDashboard = () => {
   const loadMentorProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      console.log('Loading profile for user:', user?.id);
+      
+      if (!user) {
+        console.log('No user found');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('mentors')
@@ -37,8 +43,12 @@ const MentorDashboard = () => {
         .eq('user_id', user.id)
         .single();
 
+      console.log('Mentor profile query result:', { data, error });
+
       if (!error && data) {
         setMentorProfile(data);
+      } else if (error && error.code !== 'PGRST116') {
+        console.error('Error loading mentor profile:', error);
       }
     } catch (error) {
       console.error('Error loading mentor profile:', error);
