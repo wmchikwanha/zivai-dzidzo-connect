@@ -12,10 +12,13 @@ import { Pricing } from '@/components/Pricing';
 import { Testimonials } from '@/components/Testimonials';
 import { Footer } from '@/components/Footer';
 import { InteractiveLearningModal } from '@/components/InteractiveLearningModal';
+import { AiTutorChat } from '@/components/chat/AiTutorChat';
 import { useInteractiveLearning } from '@/hooks/useInteractiveLearning';
+import { useAiTutor } from '@/hooks/useAiTutor';
 
 const Index = () => {
   const { isLearningOpen, openLearning, closeLearning } = useInteractiveLearning();
+  const { isTutorOpen, toggleTutor } = useAiTutor();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
@@ -27,6 +30,11 @@ const Index = () => {
       <Testimonials />
       <Footer onLearningClick={openLearning} />
       <InteractiveLearningModal isOpen={isLearningOpen} onClose={closeLearning} />
+      <AiTutorChat 
+        selectedLanguage="english" 
+        isOpen={isTutorOpen} 
+        onToggle={toggleTutor} 
+      />
     </div>
   );
 };
