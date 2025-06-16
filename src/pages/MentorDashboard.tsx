@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { User, Settings, DollarSign, Calendar, Star, TrendingUp } from 'lucide-react';
 import { MentorRegistrationForm } from '@/components/mentors/MentorRegistrationForm';
 import { SubscriptionPlans } from '@/components/mentors/SubscriptionPlans';
 import { ServiceManagement } from '@/components/mentors/ServiceManagement';
+import { DashboardStats } from '@/components/mentors/dashboard/DashboardStats';
+import { QuickActions } from '@/components/mentors/dashboard/QuickActions';
+import { StatusBadges } from '@/components/mentors/dashboard/StatusBadges';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MentorProfile {
@@ -84,32 +84,6 @@ const MentorDashboard = () => {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      suspended: 'bg-red-100 text-red-800'
-    };
-    return (
-      <Badge className={variants[status as keyof typeof variants] || 'bg-gray-100 text-gray-800'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
-  };
-
-  const getTierBadge = (tier: string) => {
-    const variants = {
-      basic: 'bg-blue-100 text-blue-800',
-      premium: 'bg-orange-100 text-orange-800',
-      enterprise: 'bg-purple-100 text-purple-800'
-    };
-    return (
-      <Badge className={variants[tier as keyof typeof variants] || 'bg-gray-100 text-gray-800'}>
-        {tier.charAt(0).toUpperCase() + tier.slice(1)}
-      </Badge>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -117,10 +91,10 @@ const MentorDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome back, {mentorProfile.first_name}!
           </h1>
-          <div className="flex items-center space-x-4">
-            <span>Status: {getStatusBadge(mentorProfile.status)}</span>
-            <span>Plan: {getTierBadge(mentorProfile.subscription_tier)}</span>
-          </div>
+          <StatusBadges 
+            status={mentorProfile.status} 
+            subscriptionTier={mentorProfile.subscription_tier}
+          />
         </div>
 
         {mentorProfile.status === 'pending' && (
@@ -146,69 +120,8 @@ const MentorDashboard = () => {
           </TabsList>
 
           <TabsContent value="overview">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">+0% from last month</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">$0</div>
-                  <p className="text-xs text-muted-foreground">+0% from last month</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-                  <Star className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0.0</div>
-                  <p className="text-xs text-muted-foreground">No reviews yet</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Services</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">Create your first service</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Button className="justify-start" variant="outline">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Update Profile
-                  </Button>
-                  <Button className="justify-start" variant="outline">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    View Calendar
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <DashboardStats />
+            <QuickActions />
           </TabsContent>
 
           <TabsContent value="services">
@@ -217,10 +130,7 @@ const MentorDashboard = () => {
 
           <TabsContent value="bookings">
             <Card>
-              <CardHeader>
-                <CardTitle>Your Bookings</CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="p-12 text-center">
                 <p className="text-gray-600">No bookings yet. Create some services to start receiving bookings!</p>
               </CardContent>
             </Card>
@@ -232,10 +142,7 @@ const MentorDashboard = () => {
 
           <TabsContent value="profile">
             <Card>
-              <CardHeader>
-                <CardTitle>Profile Settings</CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="p-12 text-center">
                 <p className="text-gray-600">Profile management coming soon...</p>
               </CardContent>
             </Card>

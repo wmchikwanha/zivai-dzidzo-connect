@@ -1,15 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Mail, Phone, Globe, Linkedin, DollarSign } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { PersonalInfoForm } from './registration/PersonalInfoForm';
+import { ExpertiseSelector } from './registration/ExpertiseSelector';
+import { ExperienceAndRateForm } from './registration/ExperienceAndRateForm';
 
 interface MentorFormData {
   firstName: string;
@@ -23,12 +21,6 @@ interface MentorFormData {
   linkedinUrl: string;
   websiteUrl: string;
 }
-
-const expertiseOptions = [
-  'Software Development', 'Data Science', 'Digital Marketing', 'Business Strategy',
-  'Product Management', 'UI/UX Design', 'Finance', 'Sales', 'Leadership',
-  'Entrepreneurship', 'Career Development', 'Project Management'
-];
 
 export const MentorRegistrationForm = () => {
   const { toast } = useToast();
@@ -45,6 +37,10 @@ export const MentorRegistrationForm = () => {
     linkedinUrl: '',
     websiteUrl: ''
   });
+
+  const handleFieldChange = (field: string, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleExpertiseToggle = (skill: string) => {
     setFormData(prev => ({
@@ -134,143 +130,21 @@ export const MentorRegistrationForm = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name *</Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name *</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="email"
-                type="email"
-                className="pl-10"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="phone"
-                type="tel"
-                className="pl-10"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio">Professional Bio *</Label>
-            <Textarea
-              id="bio"
-              value={formData.bio}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              placeholder="Tell potential mentees about your background, experience, and what you can help them with..."
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Areas of Expertise *</Label>
-            <div className="flex flex-wrap gap-2">
-              {expertiseOptions.map((skill) => (
-                <Badge
-                  key={skill}
-                  variant={formData.expertise.includes(skill) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleExpertiseToggle(skill)}
-                >
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="yearsExperience">Years of Experience *</Label>
-              <Input
-                id="yearsExperience"
-                type="number"
-                min="0"
-                value={formData.yearsExperience}
-                onChange={(e) => setFormData(prev => ({ ...prev, yearsExperience: parseInt(e.target.value) || 0 }))}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hourlyRate">Hourly Rate (USD) *</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Input
-                  id="hourlyRate"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="pl-10"
-                  value={formData.hourlyRate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, hourlyRate: parseFloat(e.target.value) || 0 }))}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="linkedinUrl">LinkedIn Profile</Label>
-            <div className="relative">
-              <Linkedin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="linkedinUrl"
-                type="url"
-                className="pl-10"
-                value={formData.linkedinUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, linkedinUrl: e.target.value }))}
-                placeholder="https://linkedin.com/in/yourprofile"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="websiteUrl">Personal Website</Label>
-            <div className="relative">
-              <Globe className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="websiteUrl"
-                type="url"
-                className="pl-10"
-                value={formData.websiteUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
-          </div>
+          <PersonalInfoForm 
+            formData={formData} 
+            onChange={handleFieldChange} 
+          />
+          
+          <ExpertiseSelector 
+            selectedExpertise={formData.expertise}
+            onToggle={handleExpertiseToggle}
+          />
+          
+          <ExperienceAndRateForm
+            yearsExperience={formData.yearsExperience}
+            hourlyRate={formData.hourlyRate}
+            onChange={handleFieldChange}
+          />
 
           <Button
             type="submit"
