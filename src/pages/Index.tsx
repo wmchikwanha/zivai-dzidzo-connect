@@ -11,18 +11,19 @@ import { Languages } from '@/components/Languages';
 import { Pricing } from '@/components/Pricing';
 import { Testimonials } from '@/components/Testimonials';
 import { Footer } from '@/components/Footer';
-import { InteractiveLearningModal } from '@/components/InteractiveLearningModal';
 import { AiTutorChat } from '@/components/chat/AiTutorChat';
-import { useInteractiveLearning } from '@/hooks/useInteractiveLearning';
 import { useAiTutor } from '@/hooks/useAiTutor';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { isLearningOpen, openLearning, closeLearning } = useInteractiveLearning();
   const { isTutorOpen, toggleTutor } = useAiTutor();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  
+  const handleLearningClick = () => {
+    navigate('/learning');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
@@ -56,8 +57,8 @@ const Index = () => {
         </div>
       </div>
 
-      <Header onLearningClick={openLearning} />
-      <Hero onLearningClick={openLearning} />
+      <Header onLearningClick={handleLearningClick} />
+      <Hero onLearningClick={handleLearningClick} />
       
       {/* Quick Navigation Section */}
       <section className="py-16 bg-white">
@@ -102,10 +103,9 @@ const Index = () => {
       
       <Features />
       <Languages />
-      <Pricing onLearningClick={openLearning} />
+      <Pricing onLearningClick={handleLearningClick} />
       <Testimonials />
-      <Footer onLearningClick={openLearning} />
-      <InteractiveLearningModal isOpen={isLearningOpen} onClose={closeLearning} />
+      <Footer onLearningClick={handleLearningClick} />
       <AiTutorChat 
         selectedLanguage="english" 
         isOpen={isTutorOpen} 

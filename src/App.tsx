@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import MentorDashboard from "./pages/MentorDashboard";
 import MenteeDashboard from "./pages/MenteeDashboard";
 import BrowseMentors from "./pages/BrowseMentors";
+import Learning from "./pages/Learning";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/mentor-dashboard" element={<MentorDashboard />} />
             <Route path="/mentee-dashboard" element={<MenteeDashboard />} />
             <Route path="/browse-mentors" element={<BrowseMentors />} />
+            <Route path="/learning" element={<Learning />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
