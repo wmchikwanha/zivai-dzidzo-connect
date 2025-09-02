@@ -9,6 +9,7 @@ import { DashboardStats } from '@/components/mentors/dashboard/DashboardStats';
 import { QuickActions } from '@/components/mentors/dashboard/QuickActions';
 import { StatusBadges } from '@/components/mentors/dashboard/StatusBadges';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface MentorProfile {
   id: string;
@@ -100,11 +101,26 @@ const MentorDashboard = () => {
         {mentorProfile.status === 'pending' && (
           <Card className="mb-6 border-yellow-200 bg-yellow-50">
             <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                <p className="text-yellow-800">
-                  Your mentor application is under review. We'll notify you once it's approved.
-                </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                  <p className="text-yellow-800">
+                    Your mentor application is under review.
+                  </p>
+                </div>
+                <Button
+                  onClick={async () => {
+                    const { error } = await supabase.rpc('approve_mentor', { 
+                      mentor_user_id: mentorProfile.user_id 
+                    });
+                    if (!error) {
+                      window.location.reload();
+                    }
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white text-sm"
+                >
+                  Approve for Testing
+                </Button>
               </div>
             </CardContent>
           </Card>
